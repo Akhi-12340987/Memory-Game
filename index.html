@@ -1,0 +1,90 @@
+import java.util.Scanner;
+import java.util.Random;
+
+public class MemoryGame {
+    private static final int SIZE = 4; 
+    private static int[][] board = new int[SIZE][SIZE]; 
+    private static boolean[][] revealed = new boolean[SIZE][SIZE]; 
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        initializeBoard();
+
+        while (!gameOver()) {
+            printBoard();
+            System.out.print("Enter the coordinates of the first card (row and column): ");
+            int row1 = scanner.nextInt();
+            int col1 = scanner.nextInt();
+            System.out.print("Enter the coordinates of the second card (row and column): ");
+            int row2 = scanner.nextInt();
+            int col2 = scanner.nextInt();
+
+            if (isValid(row1, col1, row2, col2)) {
+                revealed[row1][col1] = true;
+                revealed[row2][col2] = true;
+
+                if (board[row1][col1] != board[row2][col2]) {
+                    System.out.println("Not a match!");
+                    revealed[row1][col1] = false;
+                    revealed[row2][col2] = false;
+                } else {
+                    System.out.println("Match found!");
+                }
+            } else {
+                System.out.println("Invalid input or the same card selected twice.");
+            }
+        }
+
+        System.out.println("Congratulations! You've matched all pairs.");
+    }
+    private static void initializeBoard() {
+        int[] numbers = new int[SIZE * SIZE];
+        for (int i = 0; i < SIZE * SIZE / 2; i++) {
+            numbers[i * 2] = i + 1;
+            numbers[i * 2 + 1] = i + 1;
+        }
+
+        Random random = new Random();
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                int index = random.nextInt(SIZE * SIZE);
+                while (numbers[index] == 0) {
+                    index = random.nextInt(SIZE * SIZE);
+                }
+                board[i][j] = numbers[index];
+                numbers[index] = 0;
+            }
+        }
+    }
+    private static boolean gameOver() {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (!revealed[i][j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    private static void printBoard() {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (revealed[i][j]) {
+                    System.out.print(board[i][j] + " ");
+                } else {
+                    System.out.print("* ");
+                }
+            }
+            System.out.println();
+        }
+    }
+    private static boolean isValid(int row1, int col1, int row2, int col2) {
+        return row1 >= 0 && row1 < SIZE && col1 >= 0 && col1 < SIZE
+                && row2 >= 0 && row2 < SIZE && col2 >= 0 && col2 < SIZE
+                && !(row1 == row2 && col1 == col2)
+                && !revealed[row1][col1] && !revealed[row2][col2];
+    }
+}
+
+
+
